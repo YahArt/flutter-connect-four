@@ -1,6 +1,5 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'game_state.dart';
 
 main() => runApp(ConnectFourApp());
 
@@ -19,7 +18,7 @@ class ConnectFourWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: null,
+        onPressed: () {},
         child: Icon(Icons.redo),
       ),
       appBar: AppBar(
@@ -40,8 +39,28 @@ class ConnectFourGameWidget extends StatefulWidget {
 }
 
 class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
-  final int width = 7;
-  final int height = 6;
+  final GameState state = GameState();
+  int _currentRound = 0;
+  String _gameText = "Player one has to make a move...";
+  bool _won = false;
+
+  resetGame() {
+    _won = false;
+    _currentRound = 0;
+    _gameText = "Player one has to make a move...";
+    state.reset();
+  }
+
+  Color _mapStringToColor(String str) {
+    switch (str) {
+      case GameState.playerOne:
+        return Colors.yellow;
+      case GameState.playerTwo:
+        return Colors.red;
+      default:
+        return Colors.lightBlue;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +71,7 @@ class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
           padding: EdgeInsets.symmetric(vertical: 10),
           color: Colors.yellow,
           child: Text(
-            'Yellow has won',
+            _gameText,
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
@@ -61,21 +80,51 @@ class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
           child: Container(
             color: Colors.blue,
             child: GridView.count(
-              shrinkWrap: true,
-              crossAxisCount: width,
-              children: List.generate(width * height, (index) {
-                final colors = [Colors.yellow, Colors.lightBlue, Colors.red];
-                final randomIndex = Random.secure().nextInt(colors.length);
-                final color = colors[randomIndex];
-                return Container(
-                  margin: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: color,
-                  ),
-                );
-              }),
-            ),
+                shrinkWrap: true,
+                crossAxisCount: GameState.width,
+                children: state.getBoardContent().map<Widget>((boardCell) {
+                  return GestureDetector(
+                    onTap: () {
+                      if (_won) {
+                        return;
+                      }
+                      if (!state.isValidMove(boardCell.row, boardCell.col)) {
+                        setState(() {
+                          _gameText = "Invalid move...";
+                        });
+                        return;
+                      }
+                      setState(() {
+                        final content = _currentRound.isEven
+                            ? GameState.playerOne
+                            : GameState.playerTwo;
+                        final moveResult = state.addMove(
+                            boardCell.row, boardCell.col, content);
+
+                        if (state.isWinningMove(
+                            moveResult.row, moveResult.col, content)) {
+                          _won = true;
+                          _gameText = content == GameState.playerOne
+                              ? "Player one has won in round $_currentRound"
+                              : "Player two has won in round $_currentRound";
+                        } else {
+                          _gameText = content == GameState.playerOne
+                              ? "Player one has made it's move"
+                              : "Player two has made it's move...";
+
+                          _currentRound++;
+                        }
+                      });
+                    },
+                    child: Container(
+                      margin: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _mapStringToColor(boardCell.content),
+                      ),
+                    ),
+                  );
+                }).toList()),
           ),
         ),
       ],
