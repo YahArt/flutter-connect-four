@@ -1,3 +1,5 @@
+import 'dart:math';
+
 class BoardCell {
   int row;
   int col;
@@ -22,6 +24,52 @@ class GameState {
         return empty;
       });
     });
+  }
+
+  String _getRowStringForColumn(int col) {
+    List<String> elements = [];
+    for (var y = 0; y < height; y++) {
+      elements.add(_board[y][col]);
+    }
+    return "[${elements.join(", ")}]";
+  }
+
+  String _getRowStringDiagonallyTopRight(int row, int col) {
+    // This method checks the following pattern
+    /*
+      ["_", "_", "_", "x"]
+      ["_", "_", "x", "_"]
+      ["_", "x", "_", "_"]
+      ["x", "_", "_", "_"]
+
+    */
+    final rowStartPos = max(row - 3, 0);
+    final rowEndPos = min(rowStartPos + 3, height);
+    final colStartPos = min(col + 3, width - 1);
+    List<String> elements = [];
+    for (var y = rowStartPos, x = colStartPos; y <= rowEndPos; y++, x--) {
+      elements.add(_board[y][x]);
+    }
+    return "[${elements.join(", ")}]";
+  }
+
+  String _getRowStringDiagonallyTopLeft(int row, int col) {
+// This method checks the following pattern
+    /*
+      ["x", "_", "_", "_"]
+      ["_", "x", "_", "_"]
+      ["_", "_", "x", "_"]
+      ["_", "_", "_", "x"]
+
+    */
+    final rowStartPos = max(row - 3, 0);
+    final rowEndPos = min(rowStartPos + 3, height);
+    final colStartPos = max(col - 3, 0);
+    List<String> elements = [];
+    for (var y = rowStartPos, x = colStartPos; y <= rowEndPos; y++, x++) {
+      elements.add(_board[y][x]);
+    }
+    return "[${elements.join(", ")}]";
   }
 
   GameState() {
@@ -64,19 +112,34 @@ class GameState {
   }
 
   bool _hasWonVertically(int row, int col, String content) {
-    // TODO: Implement this...
-    return false;
+    final rowString = _getRowStringForColumn(col);
+    final winPattern = content == GameState.playerOne
+        ? _playerOneWinPattern
+        : _playerTwoWinPattern;
+    return rowString.contains(winPattern);
   }
 
   bool _hasWonDiagonally(int row, int col, String content) {
-    // TODO: Implement this...
-    return false;
+    final rowStringDiagonallyTopRight =
+        _getRowStringDiagonallyTopRight(row, col);
+    final rowStringDiagonallyTopLeft = _getRowStringDiagonallyTopLeft(row, col);
+    final winPattern = content == GameState.playerOne
+        ? _playerOneWinPattern
+        : _playerTwoWinPattern;
+    return rowStringDiagonallyTopRight.contains(winPattern) ||
+        rowStringDiagonallyTopLeft.contains(winPattern);
   }
 
-  isWinningMove(int row, int col, String content) {
+  bool isWinningMove(int row, int col, String content) {
     return _hasWonHorizontally(row, col, content) ||
         _hasWonVertically(row, col, content) ||
         _hasWonDiagonally(row, col, content);
+  }
+
+  bool isDraw() {
+    // We have a draw when we do not have any row that is not empty anymore -> all places are filled out...
+    return !_board.any((rowContent) =>
+        rowContent.any((element) => element == GameState.empty));
   }
 
   reset() {

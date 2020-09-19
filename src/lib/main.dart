@@ -43,6 +43,7 @@ class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
   int _currentRound = 0;
   String _gameText = "Player one has to make a move...";
   bool _won = false;
+  Color _gameTextBackgroundColor = Colors.yellow;
 
   resetGame() {
     _won = false;
@@ -69,7 +70,7 @@ class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
       children: [
         Container(
           padding: EdgeInsets.symmetric(vertical: 10),
-          color: Colors.yellow,
+          color: _gameTextBackgroundColor,
           child: Text(
             _gameText,
             textAlign: TextAlign.center,
@@ -101,12 +102,18 @@ class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
                         final moveResult = state.addMove(
                             boardCell.row, boardCell.col, content);
 
+                        _gameTextBackgroundColor = _mapStringToColor(content);
+
                         if (state.isWinningMove(
                             moveResult.row, moveResult.col, content)) {
                           _won = true;
                           _gameText = content == GameState.playerOne
                               ? "Player one has won in round $_currentRound"
                               : "Player two has won in round $_currentRound";
+                        } else if (state.isDraw()) {
+                          // Also consider this as "won"
+                          _won = true;
+                          _gameText = "This play was a draw...";
                         } else {
                           _gameText = content == GameState.playerOne
                               ? "Player one has made it's move"
