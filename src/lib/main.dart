@@ -14,11 +14,15 @@ class ConnectFourApp extends StatelessWidget {
 }
 
 class ConnectFourWidget extends StatelessWidget {
+  final _gameWidget = ConnectFourGameWidget();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          _gameWidget.resetGame();
+        },
         child: Icon(Icons.redo),
       ),
       appBar: AppBar(
@@ -28,14 +32,20 @@ class ConnectFourWidget extends StatelessWidget {
           ),
         ),
       ),
-      body: ConnectFourGameWidget(),
+      body: _gameWidget,
     );
   }
 }
 
 class ConnectFourGameWidget extends StatefulWidget {
+  final _ConnectFourGameWidgetState _state = _ConnectFourGameWidgetState();
+
   @override
-  _ConnectFourGameWidgetState createState() => _ConnectFourGameWidgetState();
+  _ConnectFourGameWidgetState createState() => _state;
+
+  resetGame() {
+    _state.resetGame();
+  }
 }
 
 class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
@@ -46,10 +56,13 @@ class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
   Color _gameTextBackgroundColor = Colors.yellow;
 
   resetGame() {
-    _won = false;
-    _currentRound = 0;
-    _gameText = "Player one has to make a move...";
-    state.reset();
+    setState(() {
+      _won = false;
+      _currentRound = 0;
+      _gameText = "Player one has to make a move...";
+      _gameTextBackgroundColor = _mapStringToColor(GameState.playerOne);
+      state.reset();
+    });
   }
 
   Color _mapStringToColor(String str) {
