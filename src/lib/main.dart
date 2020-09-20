@@ -51,7 +51,7 @@ class ConnectFourGameWidget extends StatefulWidget {
 class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
   final GameState state = GameState();
   int _currentRound = 0;
-  String _gameText = "Player one has to make a move...";
+  String _gameText = "Turn: Yellow Player";
   bool _won = false;
   Color _gameTextBackgroundColor = Colors.yellow;
 
@@ -59,7 +59,7 @@ class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
     setState(() {
       _won = false;
       _currentRound = 0;
-      _gameText = "Player one has to make a move...";
+      _gameText = "Turn: Yellow Player";
       _gameTextBackgroundColor = _mapStringToColor(GameState.playerOne);
       state.reset();
     });
@@ -104,7 +104,7 @@ class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
                       }
                       if (!state.isValidMove(boardCell.row, boardCell.col)) {
                         setState(() {
-                          _gameText = "Invalid move...";
+                          _gameText = "Error: Invalid move...";
                         });
                         return;
                       }
@@ -121,16 +121,23 @@ class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
                             moveResult.row, moveResult.col, content)) {
                           _won = true;
                           _gameText = content == GameState.playerOne
-                              ? "Player one has won in round $_currentRound"
-                              : "Player two has won in round $_currentRound";
+                              ? "Yellow Player has won in turn $_currentRound"
+                              : "Red Player has won in turn $_currentRound";
                         } else if (state.isDraw()) {
                           // Also consider this as "won"
                           _won = true;
                           _gameText = "This play was a draw...";
                         } else {
-                          _gameText = content == GameState.playerOne
-                              ? "Player one has made it's move"
-                              : "Player two has made it's move...";
+                          // Display text for NEXT player turn (content is the current player...)
+                          final nextPlayer = content == GameState.playerOne
+                              ? GameState.playerTwo
+                              : GameState.playerOne;
+                          _gameText = nextPlayer == GameState.playerOne
+                              ? "Turn: Yellow Player"
+                              : "Turn: Red Player";
+
+                          _gameTextBackgroundColor =
+                              _mapStringToColor(nextPlayer);
 
                           _currentRound++;
                         }

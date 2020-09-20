@@ -43,18 +43,29 @@ class GameState {
       ["x", "_", "_", "_"]
 
     */
-    final rowStartPos = max(row - 3, 0);
-    final rowEndPos = min(rowStartPos + 3, height);
-    final colStartPos = min(col + 3, width - 1);
+    var rowStartPos = row;
+    var rowEndPos = row;
+    var colStartPos = col;
+    while (rowStartPos >= 0 && colStartPos <= width) {
+      rowStartPos--;
+      colStartPos++;
+      rowEndPos++;
+    }
+
+    rowStartPos = max(rowStartPos, 0);
+    rowEndPos = min(rowEndPos, height - 1);
+    colStartPos = min(colStartPos, width - 1);
+
     List<String> elements = [];
     for (var y = rowStartPos, x = colStartPos; y <= rowEndPos; y++, x--) {
+      x = max(x, 0);
       elements.add(_board[y][x]);
     }
     return "[${elements.join(", ")}]";
   }
 
   String _getRowStringDiagonallyTopLeft(int row, int col) {
-// This method checks the following pattern
+    // This method checks the following pattern
     /*
       ["x", "_", "_", "_"]
       ["_", "x", "_", "_"]
@@ -62,11 +73,22 @@ class GameState {
       ["_", "_", "_", "x"]
 
     */
-    final rowStartPos = max(row - 3, 0);
-    final rowEndPos = min(rowStartPos + 3, height);
-    final colStartPos = max(col - 3, 0);
+    var rowStartPos = row;
+    var rowEndPos = row;
+    var colStartPos = col;
+    while (rowStartPos >= 0 && colStartPos >= 0) {
+      rowStartPos--;
+      colStartPos--;
+      rowEndPos++;
+    }
+
+    rowStartPos = max(rowStartPos, 0);
+    rowEndPos = min(rowEndPos, height - 1);
+    colStartPos = max(colStartPos, 0);
+
     List<String> elements = [];
     for (var y = rowStartPos, x = colStartPos; y <= rowEndPos; y++, x++) {
+      x = min(x, width - 1);
       elements.add(_board[y][x]);
     }
     return "[${elements.join(", ")}]";
