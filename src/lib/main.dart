@@ -60,13 +60,13 @@ class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
       _won = false;
       _currentRound = 0;
       _gameText = "Turn: Yellow Player";
-      _gameTextBackgroundColor = _mapStringToColor(GameState.playerOne);
+      _gameTextBackgroundColor = _getPlayerColor(GameState.playerOne);
       state.reset();
     });
   }
 
-  Color _mapStringToColor(String str) {
-    switch (str) {
+  Color _getPlayerColor(String player) {
+    switch (player) {
       case GameState.playerOne:
         return Colors.yellow;
       case GameState.playerTwo:
@@ -115,7 +115,7 @@ class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
                         final moveResult = state.addMove(
                             boardCell.row, boardCell.col, content);
 
-                        _gameTextBackgroundColor = _mapStringToColor(content);
+                        _gameTextBackgroundColor = _getPlayerColor(content);
 
                         if (state.isWinningMove(
                             moveResult.row, moveResult.col, content)) {
@@ -137,7 +137,7 @@ class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
                               : "Turn: Red Player";
 
                           _gameTextBackgroundColor =
-                              _mapStringToColor(nextPlayer);
+                              _getPlayerColor(nextPlayer);
 
                           _currentRound++;
                         }
@@ -147,7 +147,7 @@ class _ConnectFourGameWidgetState extends State<ConnectFourGameWidget> {
                       margin: EdgeInsets.all(5),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _mapStringToColor(boardCell.content),
+                        color: _getPlayerColor(boardCell.content),
                       ),
                     ),
                   );
